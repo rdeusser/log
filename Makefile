@@ -11,18 +11,16 @@ export OLDPWD
 
 FILES_TO_FMT ?= $(shell find . -path ./vendor -prune -o -name '*.go' -print)
 
-DOCKER_IMAGE_REPO ?= change-me
-
 GOBIN		   ?= $(firstword $(subst :, ,${GOPATH}))/bin
 GO111MODULE	   ?= on
 export GO111MODULE
 
 # Dependencies
 
-GOIMPORTS_VERSION             ?= master
+GOIMPORTS_VERSION             ?= latest
 GOIMPORTS                     ?= $(GOBIN)/goimports
 
-REVIVE_VERSION                ?= v1.2.1
+REVIVE_VERSION                ?= latest
 REVIVE                        ?= $(GOBIN)/revive
 
 .DEFAULT_GOAL := help
@@ -63,24 +61,6 @@ test: ## Runs all log's unit tests. This excludes tests in ./test/e2e.
 test/e2e: ## Runs all log's e2e tests from test/e2e.
 	@echo "==> Running e2e tests"
 	@go test -v -tags=e2e -coverprofile=coverage.out ./test/e2e/...
-
-.PHONY: build
-build: ## Build log.
-	@echo "==> Building log"
-	@-CGO_ENABLED=0 \
-		go build \
-		-o bin/log \
-		$(BUILD_PATH)
-
-.PHONY: install
-install: build ## Install log.
-	@echo "==> Installing log"
-	@mv ./bin/log $(GOBIN)/log
-
-.PHONY: docker-build
-docker-build: ## Build docker image.
-	@echo "==> Building docker image"
-	@docker build -t $(DOCKER_IMAGE_REPO):$(VERSION) --build-arg GOPROXY=$(GOPROXY) .
 
 .PHONY: bump-version
 bump-version: ## Bump the version in the version file. Set SEMVER to [ patch (default) | major | minor ].
