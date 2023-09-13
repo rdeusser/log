@@ -28,7 +28,7 @@ func New() (*zap.Logger, zap.AtomicLevel) {
 		core = zapcore.NewCore(cliEncoder, os.Stdout, leveler)
 	}
 
-	logger := zap.New(core)
+	logger := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
 	defer logger.Sync()
 
 	return logger, atom
